@@ -2063,7 +2063,7 @@ create_config_files_for_new_repository() {
   local autotagging=$7
   local garbage_collectable=$8
   local configure_apache=$9
-  local compression_alg=$10
+  local compression_alg=${10}
 
   # other configurations
   local spool_dir="/var/spool/cvmfs/${name}"
