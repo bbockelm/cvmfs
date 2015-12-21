@@ -4381,9 +4381,9 @@ publish() {
     if [ "x$CVMFS_MAXIMAL_CONCURRENT_WRITES" != "x" ]; then
       sync_command="$sync_command -q $CVMFS_MAXIMAL_CONCURRENT_WRITES"
     fi
-    if [ "x${CVMFS_VOMS_AUTHZ}" != x ]; then
-      sync_command="$sync_command -V $CVMFS_VOMS_AUTHZ"
-    fi
+    #if [ "x${CVMFS_VOMS_AUTHZ}" != x ]; then
+    #  sync_command="$sync_command -V $CVMFS_VOMS_AUTHZ"
+    #fi
     local tag_command="$(__swissknife_cmd dbg) tag_create \
       -r $upstream                                        \
       -w $stratum0                                        \
