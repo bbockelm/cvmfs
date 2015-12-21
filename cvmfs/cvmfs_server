@@ -283,6 +283,7 @@ Supported Commands:
                 [-k path to existing keychain]
                 [-k path to existing keychain] [-p no apache config]
                 [-V VOMS authorization]
+                [-Z compression algorithm (default: zlib)]
                 <fully qualified repository name>
                 Creates a new repository with a given name
   add-replica   [-u stratum1 upstream storage] [-o owner] [-w stratum1 url]
@@ -1701,7 +1702,7 @@ sign_manifest() {
     -n $name                            \
     -m $unsigned_manifest               \
     -t ${CVMFS_SPOOL_DIR}/tmp           \
-    -r $CVMFS_UPSTREAM_STORAGE" > /dev/null
+    -r $CVMFS_UPSTREAM_STORAGE" >/dev/null
 }
 
 
@@ -2062,6 +2063,7 @@ create_config_files_for_new_repository() {
   local autotagging=$7
   local garbage_collectable=$8
   local configure_apache=$9
+  local compression_alg=$10
 
   # other configurations
   local spool_dir="/var/spool/cvmfs/${name}"
@@ -2091,6 +2093,7 @@ CVMFS_MAX_CHUNK_SIZE=$CVMFS_DEFAULT_MAX_CHUNK_SIZE
 CVMFS_CATALOG_ENTRY_WARN_THRESHOLD=$CVMFS_DEFAULT_CATALOG_ENTRY_WARN_THRESHOLD
 CVMFS_UNION_FS_TYPE=$unionfs
 CVMFS_HASH_ALGORITHM=$hash_algo
+CVMFS_COMPRESSION_ALGORITHM=$compression_alg
 CVMFS_AUTO_TAG=$autotagging
 CVMFS_GARBAGE_COLLECTION=$garbage_collectable
 CVMFS_AUTO_REPAIR_MOUNTPOINT=true
@@ -2698,6 +2701,7 @@ mkfs() {
   local autotagging=true
   local unionfs
   local hash_algo
+  local compression_alg
   local garbage_collectable=false
   local s3_config=""
   local keys_import_location
@@ -2708,7 +2712,7 @@ mkfs() {
 
   # parameter handling
   OPTIND=1
-  while getopts "Xw:u:o:mf:vga:zs:k:pV:" option; do
+  while getopts "Xw:u:o:mf:vga:zs:k:pV:Z:" option; do
     case $option in
       X)
         external_data=1
@@ -2752,6 +2756,9 @@ mkfs() {
       V)
         voms_authz=$OPTARG
       ;;
+      Z)
+        compression_alg=$OPTARG
+      ;;
       ?)
         shift $(($OPTIND-2))
         usage "Command mkfs: Unrecognized option: $1"
@@ -2767,6 +2774,7 @@ mkfs() {
   # default values
   [ x"$unionfs"   = x"" ] && unionfs="$(get_available_union_fs)"
   [ x"$hash_algo" = x"" ] && hash_algo=sha1
+  [ x"$compression_alg" = x"" ] && compression_alg=default
 
   # upstream generation (defaults to local upstream)
   if [ x"$upstream" = x"" ]; then
@@ -2843,7 +2851,8 @@ mkfs() {
                                          "$hash_algo"           \
                                          "$autotagging"         \
                                          "$garbage_collectable" \
-                                         "$configure_apache" || die "fail"
+                                         "$configure_apache"    \
+                                         "$compression_alg" || die "fail"
   if is_local_upstream $upstream && [ $configure_apache -eq 1 ]; then
     reload_apache > /dev/null
   fi
@@ -4274,6 +4283,7 @@ publish() {
     stratum0=$CVMFS_STRATUM0
     upstream=$CVMFS_UPSTREAM_STORAGE
     hash_algorithm="${CVMFS_HASH_ALGORITHM-sha1}"
+    compression_alg="${CVMFS_COMPRESSION_ALGORITHM-default}"
 
     # more sanity checks
     is_owner_or_root $name || { echo "Permission denied: Repository $name is owned by $user"; retcode=1; continue; }
@@ -4329,6 +4339,7 @@ publish() {
       -w $stratum0                                   \
       -o $manifest                                   \
       -e $hash_algorithm                             \
+      -Z $compression_alg                            \
       $(get_follow_http_redirects_flag)              \
       $log_level $tweaks_option $external_option $verbosity"
     if [ "x$CVMFS_UNION_FS_TYPE" != "x" ]; then
@@ -4536,6 +4547,7 @@ rollback() {
   local user_shell="$(get_user_shell $name)"
   local base_hash=$(get_mounted_root_hash $name)
   local hash_algorithm="${CVMFS_HASH_ALGORITHM-sha1}"
+  local compression_alg="${CVMFS_COMPRESSION_ALGORITHM-default}"
 
   local rollback_command="$(__swissknife_cmd dbg) tag_rollback \
     -w $stratum0                                               \

@@ -237,7 +237,9 @@ LoadError ClientCatalogManager::LoadCatalogCas(
   const ClientCtx *ctx)
 {
   assert(hash.suffix == shash::kSuffixCatalog);
+  // Catalogs are always zlib compressed
   int fd = fetcher_->Fetch(hash, cache::CacheManager::kSizeUnknown, name,
+                           zlib::kZlibDefault,
                            cache::CacheManager::kTypeCatalog,
                            ctx ? ctx->pid : -1, ctx ? ctx->uid : -1,
                            ctx ? ctx->gid : -1, alt_catalog_path);

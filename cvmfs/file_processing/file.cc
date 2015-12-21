@@ -16,6 +16,7 @@ File::File(const std::string    &path,
            IoDispatcher         *io_dispatcher,
            ChunkDetector        *chunk_detector,
            shash::Algorithms     hash_algorithm,
+           zlib::Algorithms      compression_alg,
            const shash::Suffix   hash_suffix,
            const std::string    &alt_path) :
   AbstractFile(path, GetFileSize(path)),
@@ -23,6 +24,7 @@ File::File(const std::string    &path,
                         chunk_detector->MightFindChunks(size())),
   hash_algorithm_(hash_algorithm),
   hash_suffix_(hash_suffix),
+  compression_alg_(compression_alg),
   bulk_chunk_(NULL),
   io_dispatcher_(io_dispatcher),
   chunk_detector_(chunk_detector),
@@ -71,7 +73,7 @@ void File::CreateInitialChunk() {
   assert(chunks_.size() == 0);
 
   const off_t offset = 0;
-  Chunk *new_chunk   = new Chunk(this, offset, hash_algorithm_);
+  Chunk *new_chunk = new Chunk(this, offset, hash_algorithm_, compression_alg_);
 
   if (might_become_chunked_) {
     // for a potentially chunked file, the initial chunk needs to defer the
@@ -111,7 +113,7 @@ Chunk* File::CreateNextChunk(const off_t offset) {
   // will start at 'offset'
   latest_chunk->set_size(offset - latest_chunk->offset());
   Chunk *predecessor = latest_chunk;
-  AddChunk(new Chunk(this, offset, hash_algorithm_));
+  AddChunk(new Chunk(this, offset, hash_algorithm_, compression_alg_));
 
   return predecessor;
 }
