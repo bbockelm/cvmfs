@@ -523,6 +523,7 @@ void SyncMediator::PublishFilesCallback(const upload::SpoolerResult &result) {
       item.CreateBasicCatalogDirent(),
       *xattrs,
       item.IsExternalData(),
+      zlib::kUnknown,
       item.relative_parent_path());
   }
 
@@ -626,6 +627,7 @@ void SyncMediator::AddFile(const SyncItem &entry) {
       entry.CreateBasicCatalogDirent(),
       default_xattrs,
       entry.IsExternalData(),
+      zlib::kUnknown,
       entry.relative_parent_path());
   } else if (entry.HasGraftMarker()) {
     if (entry.IsValidGraft()) {
@@ -635,6 +637,7 @@ void SyncMediator::AddFile(const SyncItem &entry) {
         default_xattrs,  // TODO(bbockelm): For now, use default xattrs
                          // on grafted files.
         entry.IsExternalData(), // TODO: Allow this to be specified in graft.
+        union_engine_->GetCompressionAlgorithm(),
         entry.relative_parent_path());
     } else {
       // Unlike with regular files, grafted files can be "unpublishable" - i.e.,
