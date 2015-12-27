@@ -1833,7 +1833,7 @@ ensure_swissknife_suid() {
 
   # check if we need CAP_SYS_ADMIN for cvmfs_swissknife...
   is_root || die "need to be root for granting CAP_SYS_ADMIN to $sk_bin"
-  [ x"$unionfs" = x"overlayfs" ] || return 0
+  #[ x"$unionfs" = x"overlayfs" ] || return 0
 
   # ... yes, obviously we need CAP_SYS_ADMIN for cvmfs_swissknife
   _setcap_if_needed "$sk_bin"     "$cap" || return 1
@@ -2241,7 +2241,7 @@ setup_and_mount_new_repository() {
     if [ x"$(get_overlayfs_type)" = x"$OFS_POST_V22" ]; then
       ofs_workdir=",workdir=${ofs_workdir}"
     else
-      ofs_workdir=""
+      ofs_workdir=",workdir=${ofs_workdir}"
     fi
     cat >> /etc/fstab << EOF
 cvmfs2#$name $rdonly_dir fuse allow_other,config=/etc/cvmfs/repositories.d/${name}/client.conf:${CVMFS_SPOOL_DIR}/client.local,cvmfs_suid,noauto 0 0 # added by CernVM-FS for $name
