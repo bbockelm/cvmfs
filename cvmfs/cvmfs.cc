@@ -2610,7 +2610,8 @@ static int Init(const loader::LoaderExports *loader_exports) {
   if (follow_redirects) {
     cvmfs::external_download_manager_->EnableRedirects();
   }
-  cvmfs::external_download_manager_->SetTimeout(timeout, timeout_direct);
+  cvmfs::external_download_manager_->SetTimeout(external_timeout,
+                                                external_timeout_direct);
   cvmfs::external_download_manager_->SetLowSpeedLimit(low_speed_limit);
   cvmfs::external_download_manager_->SetProxyGroupResetDelay(proxy_reset_after);
   cvmfs::external_download_manager_->SetHostResetDelay(host_reset_after);
