@@ -43,7 +43,9 @@ enum cvmcache_status {
   // Attempt to read from an offset larger than the object size
   CVMCACHE_STATUS_OUTOFBOUNDS,
   // Cache content could not be evicted to requested size
-  CVMCACHE_STATUS_PARTIAL
+  CVMCACHE_STATUS_PARTIAL,
+  CVMCACHE_STATUS_ALLOC,      // Memory allocation error
+  CVMCACHE_STATUS_OTHER,      // Generic error
 };
 
 // Mirrors cvmfs::EnumObjectType protobuf definition
