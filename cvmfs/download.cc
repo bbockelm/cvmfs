@@ -968,7 +968,7 @@ void DownloadManager::SetUrlOptions(JobInfo *info) {
                  "uses secure downloads but no credentials attachment set");
       } else {
         bool retval = credentials_attachment_->ConfigureCurlHandle(
-          curl_handle, info->pid, &info->cred_data);
+          curl_handle, info->pid, header_lists_, info->headers, &info->cred_data);
         if (!retval) {
           LogCvmfs(kLogDownload, kLogDebug, "failed attaching credentials");
         }

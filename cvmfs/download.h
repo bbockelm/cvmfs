@@ -297,6 +297,8 @@ class CredentialsAttachment {
   virtual ~CredentialsAttachment() { }
   virtual bool ConfigureCurlHandle(CURL *curl_handle,
                                    pid_t pid,
+                                   HeaderLists *header_mgr,
+                                   curl_slist *request_headers,
                                    void **info_data) = 0;
   virtual void ReleaseCurlHandle(CURL *curl_handle, void *info_data) = 0;
 };

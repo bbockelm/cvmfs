@@ -154,6 +154,8 @@ bool AuthzAttachment::ConfigureSciTokenCurl(
 bool AuthzAttachment::ConfigureCurlHandle(
   CURL *curl_handle,
   pid_t pid,
+  download::HeaderLists *header_mgr,
+  curl_slist *output_headers,
   void **info_data)
 {
   assert(info_data);

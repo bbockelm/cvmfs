@@ -19,6 +19,8 @@ class AuthzAttachment : public download::CredentialsAttachment {
 
   virtual bool ConfigureCurlHandle(CURL *curl_handle,
                                    pid_t pid,
+                                   download::HeaderLists *header_mgr,
+                                   curl_slist *append_headers,
                                    void **info_data);
   virtual void ReleaseCurlHandle(CURL *curl_handle, void *info_data);
 
